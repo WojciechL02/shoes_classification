@@ -1,7 +1,7 @@
 ## SHOES CLASSIFICATION (ADIDAS, NIKE, CONVERSE)
 ### Description
 Multiclass classification dataset from Kaggle:
-https://www.kaggle.com/datasets/die9origephit/nike-adidas-and-converse-imaged
+https://www.kaggle.com/datasets/die9origephit/nike-adidas-and-converse-imaged <br />
 This is my first project in Computer Vision.
 
 ### Requirements
