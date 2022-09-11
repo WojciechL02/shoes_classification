@@ -11,8 +11,7 @@ https://www.kaggle.com/datasets/die9origephit/nike-adidas-and-converse-imaged
 ### Description
 Implemented CNN from scratch with Pytorch and compared with pretrained ResNet50.
 Tested various optimizers including: SGD, Adam, AdamW.
-In experiments I found out that  the best results my CNN gained with SGD + Nesterov momentum <br />
-and in ResNet - Adam with L2 regularization.
+In experiments I found out that  the best results my CNN gained with SGD + Nesterov momentum and in ResNet - Adam with L2 regularization.
 
 ### Results
 CNN from scratch: ~50% accuracy <br />
