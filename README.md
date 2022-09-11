@@ -2,6 +2,7 @@
 ### Description
 Multiclass classification dataset from Kaggle:
 https://www.kaggle.com/datasets/die9origephit/nike-adidas-and-converse-imaged
+This is my first project in Computer Vision.
 
 ### Requirements
 * Python 3.9
