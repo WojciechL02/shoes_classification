@@ -17,7 +17,7 @@ and in ResNet - Adam with L2 regularization.
 ### Results
 CNN from scratch: ~50% accuracy <br />
 
-![CNN]("plots/cnn_acc.png" width="100")
+![CNN](plots/cnn_acc.png)
 
 ResNet50: ~80% accuracy <br />
 
