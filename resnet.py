@@ -31,7 +31,7 @@ t = transforms.Compose(
 train_dataset = ImageFolder(root=TRAIN_PATH, transform=t)
 test_dataset = ImageFolder(root=TEST_PATH)
 
-train_loader = DataLoader(train_dataset, shuffle=True)
+train_loader = DataLoader(train_dataset, shuffle=True, batch_size=3)
 test_loader = DataLoader(test_dataset)
 
 
@@ -46,5 +46,15 @@ optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
 
 def train(model, device, train_loader, criterion, optimizer, epoch):
-    pass
+    model.train()
+    sum_loss = 0
+    for batch_id, (data, label) in enumerate(train_loader):
+        data, label = data.to(device), label.to(device)
+        optimizer.zero_grad()
+        output = model(data)
+        pred = output.argmax(dim=1, keepdim=True)
+        correct = pred.eq(label.view_as(pred)).sum().item()
+        loss = criterion(output, label)
+        loss.backward()
+        optimizer.step()
 
