@@ -10,7 +10,7 @@ from matplotlib import pyplot as plt
 from matplotlib import figure
 
 
-class Net(nn.Module):
+class Net(nn.Module): # Resnet50 z przetrenowanymi wagami
     def __init__(self) -> None:
         super().__init__()
         self.conv1 = nn.Conv2d(3, 16, 3, 1)
@@ -23,6 +23,7 @@ class Net(nn.Module):
         self.fc2 = nn.Linear(1024, 3)
 
     def forward(self, x):
+
         x = self.conv1(x)
         x = F.relu(x)
 
@@ -126,14 +127,14 @@ def main():
     device = ("cuda" if torch.cuda.is_available() else "cpu")
     train_path = "data/train"
     test_path = "data/test"
-    save_path = "cnn_model.pth"
+    save_path = "cnn/cnn_model.pth"
 
     mean = (0.6851, 0.6713, 0.6657)
     std = (0.3085, 0.3110, 0.3153)
 
     BATCH_SIZE = 16
     LEARNING_RATE = 0.0018
-    GAMMA = 0.97
+    GAMMA = 1e-5
     EPOCHS = 50
 
     transforms = Compose(
@@ -141,14 +142,14 @@ def main():
             # CenterCrop(size=220),
             # Resize(size=200),
             RandomRotation(degrees=20),
-            RandomHorizontalFlip(p=0.3),
+            RandomHorizontalFlip(p=0.5),# color jitter shear
             ToTensor(),
             Normalize(mean, std)
         ]
     )
 
     train_dataset = ImageFolder(root=train_path, transform=transforms)
-    test_dataset = ImageFolder(root=test_path, transform=transforms)
+    test_dataset = ImageFolder(root=test_path)
 
     train_loader = DataLoader(train_dataset, shuffle=True, batch_size=BATCH_SIZE, drop_last=True)
     test_loader = DataLoader(test_dataset, shuffle=True, batch_size=BATCH_SIZE, drop_last=True)
@@ -181,3 +182,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+# recall, precison, F1, AUC, Confusion MAtrix, TP, Tn, FP, FN
