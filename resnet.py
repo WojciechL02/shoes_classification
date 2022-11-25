@@ -45,10 +45,6 @@ criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
 
-for batch_id, (data, label) in enumerate(train_loader):
-    print(len(data))
-
-
 def train(model, device, train_loader, criterion, optimizer, epoch):
     model.train()
     sum_loss = 0
@@ -71,9 +67,26 @@ def train(model, device, train_loader, criterion, optimizer, epoch):
 
     avg_loss = sum_loss / n_samples
     accuracy = 100 * correct / n_samples
-    print("Epoch={epoch}, avg_loss={avg_loss:.3f}, acc={accuracy:.2f}")
+
+    print(f"Epoch={epoch}, avg_loss={avg_loss:.3f}, acc={accuracy:.2f}")
     return avg_loss, accuracy
 
 
+def validate(model, device, test_loader, criterion):
+    model.eval()
+    test_loss = 0
+    correct = 0
+    with torch.no_grad():
+        for data, label in test_loader:
+            data, label = data.to(device), label.to(device)
+            output = model(data)
+            test_loss += criterion(output, label).item()
+            pred = output.argmax(dim=1, keepdim=True)
+            correct += pred.eq(label.view_as(pred)).sum().item()
 
+    test_loss /= len(test_loader.dataset)
+    accuracy = 100 * correct / len(test_loader.dataset)
+
+    print(f"\tVAL: Loss={test_loss:.3f}, Acc={accuracy:.1f}")
+    return test_loss, accuracy
 
