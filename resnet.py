@@ -59,26 +59,18 @@ def main():
     train_recall = []
     train_precision = []
     train_f1score = []
-    best_val_acc = 0
-    best_model_wts = copy.deepcopy(model.state_dict())
 
     for epoch in range(1):
-        # loss, acc, recall, prec, f1 = train(model, device, train_loader, criterion, optimizer, metrics, epoch)
-        # train_acc.append(acc)
-        # train_loss.append(loss)
-        # train_recall.append(recall)
-        # train_precision.append(prec)
-        # train_f1score.append(f1)
+        loss, acc, recall, prec, f1 = train(model, device, train_loader, criterion, optimizer, metrics, epoch)
+        train_acc.append(acc)
+        train_loss.append(loss)
+        train_recall.append(recall)
+        train_precision.append(prec)
+        train_f1score.append(f1)
 
-        v_loss, v_acc = validate(model, device, test_loader, criterion)
-        val_acc.append(v_acc)
-        val_loss.append(v_loss)
-
-        # if v_acc > best_val_acc:
-        #     best_val_acc = v_acc
-        #     best_model_wts = copy.deepcopy(model.state_dict())
-
-    # torch.save(best_model_wts, "resnet.pth")
+        # v_loss, v_acc = validate(model, device, test_loader, criterion)
+        # val_acc.append(v_acc)
+        # val_loss.append(v_loss)
 
     print(train_acc)
     print(train_recall)
