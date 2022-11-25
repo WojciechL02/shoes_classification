@@ -45,16 +45,35 @@ criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
 
+for batch_id, (data, label) in enumerate(train_loader):
+    print(len(data))
+
+
 def train(model, device, train_loader, criterion, optimizer, epoch):
     model.train()
     sum_loss = 0
+    n_samples = 0
+    correct = 0
     for batch_id, (data, label) in enumerate(train_loader):
         data, label = data.to(device), label.to(device)
         optimizer.zero_grad()
         output = model(data)
         pred = output.argmax(dim=1, keepdim=True)
+
         correct = pred.eq(label.view_as(pred)).sum().item()
+
         loss = criterion(output, label)
         loss.backward()
         optimizer.step()
+
+        n_samples += len(data)
+        sum_loss += loss.item()
+
+    avg_loss = sum_loss / n_samples
+    accuracy = 100 * correct / n_samples
+    print("Epoch={epoch}, avg_loss={avg_loss:.3f}, acc={accuracy:.2f}")
+    return avg_loss, accuracy
+
+
+
 
