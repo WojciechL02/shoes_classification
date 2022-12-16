@@ -14,7 +14,7 @@ def main() -> None:
     TRAIN_PATH = "data/train"
     TEST_PATH = "data/test"
 
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     t = transforms.Compose(
         [
@@ -34,8 +34,8 @@ def main() -> None:
     )
 
     BATCH_SIZE = 64
-    LEARNING_RATE = 0.1
-    EPOCHS = 5
+    LEARNING_RATE = 0.002
+    EPOCHS = 10
 
     train_dataset = ImageFolder(root=TRAIN_PATH, transform=t)
     test_dataset = ImageFolder(root=TEST_PATH, transform=test_t)
@@ -53,11 +53,11 @@ def main() -> None:
     model = model.to(device)
 
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE)  # ustawic L2, momentum, nesterov
+    # optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=0.9)  # ustawic L2, momentum, nesterov
     # optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
-    # optimizer = optim.NAdam(model.parameters(), lr=LEARNING_RATE)
+    optimizer = optim.NAdam(model.parameters(), lr=LEARNING_RATE)
 
-    metrics_logger = MetricsLogger(model_name="ResNet18", num_classes=3)
+    metrics_logger = MetricsLogger(device, model_name="ResNet18", num_classes=3)
 
     for epoch in range(1, EPOCHS + 1):
         train(model, device, train_loader, criterion, optimizer, epoch, metrics_logger)
