@@ -17,14 +17,12 @@ class Net(nn.Module):
         super().__init__()
         self.conv1 = nn.Conv2d(3, 16, 3, 1, padding='same')
         self.conv2 = nn.Conv2d(16, 32, 3, 1, padding='same')
-        self.conv3 = nn.Conv2d(32, 32, 3, 1, padding='same')
-        self.conv4 = nn.Conv2d(32, 64, 3, 1, padding='same')
-        self.conv5 = nn.Conv2d(64, 64, 3, 1, padding='same')
+        self.conv3 = nn.Conv2d(32, 64, 3, 1, padding='same')
         # self.b_norm2d = nn.BatchNorm2d(16)
         # self.b_norm1d = nn.BatchNorm1d(num_features=1024)
         # self.dropout1 = nn.Dropout(0.3)
         # self.dropout2 = nn.Dropout(0.5)
-        self.fc1 = nn.Linear(32 * 56 * 56, 256)
+        self.fc1 = nn.Linear(64 * 28 * 28, 256)
         self.fc2 = nn.Linear(256, 3)
 
     def forward(self, x):
@@ -38,14 +36,6 @@ class Net(nn.Module):
         x = F.max_pool2d(x, 2)
 
         x = self.conv3(x)
-        x = F.relu(x)
-        x = F.max_pool2d(x, 2)
-
-        x = self.conv4(x)
-        x = F.relu(x)
-        x = F.max_pool2d(x, 2)
-
-        x = self.conv5(x)
         x = F.relu(x)
         x = F.max_pool2d(x, 2)
 
@@ -80,10 +70,10 @@ def main():
         ]
     )
 
-    BATCH_SIZE = 32
-    LEARNING_RATE = 0.01
+    BATCH_SIZE = 64
+    LEARNING_RATE = 0.001
     GAMMA = 1e-5
-    EPOCHS = 10
+    EPOCHS = 20
 
     train_dataset = ImageFolder(root=train_path, transform=t)
     test_dataset = ImageFolder(root=test_path, transform=test_t)
@@ -92,10 +82,11 @@ def main():
 
     model = Net().to(device)
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=0.9, nesterov=True, weight_decay=1e-5)
+    # optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=0.9, nesterov=True, weight_decay=1e-5)
+    optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
     # scheduler = StepLR(optimizer=optimizer, step_size=5, gamma=GAMMA)
 
-    metrics_logger = MetricsLogger(model_name="CNN", num_classes=3)
+    metrics_logger = MetricsLogger(device, model_name="CNN", num_classes=3)
 
     for epoch in range(1, EPOCHS + 1):
         train(model, device, train_loader, criterion, optimizer, epoch, metrics_logger)
