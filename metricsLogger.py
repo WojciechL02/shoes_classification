@@ -3,13 +3,14 @@ from torch.utils.tensorboard import SummaryWriter
 
 
 class MetricsLogger:
-    def __init__(self, model_name, num_classes) -> None:
+    def __init__(self, device, model_name, num_classes) -> None:
         self.mn = model_name
+        self.device = device
         self.writer = SummaryWriter()
-        self.accuracy = Accuracy(average='macro', num_classes=num_classes)
-        self.recall = Recall(average='macro', num_classes=num_classes)
-        self.precision = Precision(average='macro', num_classes=num_classes)
-        self.f1score = F1Score(average='macro', num_classes=num_classes)
+        self.accuracy = Accuracy(average='macro', num_classes=num_classes).to(self.device)
+        self.recall = Recall(average='macro', num_classes=num_classes).to(self.device)
+        self.precision = Precision(average='macro', num_classes=num_classes).to(self.device)
+        self.f1score = F1Score(average='macro', num_classes=num_classes).to(self.device)
 
     def log_epoch(self, y_pred, y_true, loss, epoch, training=True):
         t = "train" if training else "val"
