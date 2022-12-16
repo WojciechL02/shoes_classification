@@ -26,12 +26,19 @@ def main() -> None:
         ]
     )
 
+    test_t = transforms.Compose(
+        [
+            transforms.CenterCrop(224),
+            transforms.ToTensor()
+        ]
+    )
+
     BATCH_SIZE = 64
     LEARNING_RATE = 0.1
     EPOCHS = 5
 
     train_dataset = ImageFolder(root=TRAIN_PATH, transform=t)
-    test_dataset = ImageFolder(root=TEST_PATH, transform=transforms.ToTensor())
+    test_dataset = ImageFolder(root=TEST_PATH, transform=test_t)
     train_loader = DataLoader(train_dataset, shuffle=True, batch_size=BATCH_SIZE)
     test_loader = DataLoader(test_dataset)
 
@@ -50,7 +57,7 @@ def main() -> None:
     # optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
     # optimizer = optim.NAdam(model.parameters(), lr=LEARNING_RATE)
 
-    metrics_logger = MetricsLogger(num_classes=3)
+    metrics_logger = MetricsLogger(model_name="ResNet18", num_classes=3)
 
     for epoch in range(1, EPOCHS + 1):
         train(model, device, train_loader, criterion, optimizer, epoch, metrics_logger)
