@@ -1,5 +1,6 @@
 *.pyc
 *.pth
 .vscode
-data/
-plots/
+/data
+/plots
+/runs
