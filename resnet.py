@@ -4,7 +4,7 @@ from torch import nn
 from torch.utils.data import DataLoader
 from torchvision.datasets import ImageFolder
 from torchvision import transforms
-from torchvision.models import resnet50, ResNet50_Weights
+from torchvision.models import resnet18, ResNet18_Weights
 from train import train
 from validate import validate
 from metricsLogger import MetricsLogger
@@ -27,7 +27,7 @@ def main() -> None:
     )
 
     BATCH_SIZE = 64
-    LEARNING_RATE = 0.001
+    LEARNING_RATE = 0.1
     EPOCHS = 5
 
     train_dataset = ImageFolder(root=TRAIN_PATH, transform=t)
@@ -36,7 +36,7 @@ def main() -> None:
     test_loader = DataLoader(test_dataset)
 
 
-    model = resnet50(weights=ResNet50_Weights.DEFAULT)
+    model = resnet18(weights=ResNet18_Weights.DEFAULT)
     # freeze extractor weights
     for param in model.parameters():
         param.requires_grad = False
@@ -46,7 +46,7 @@ def main() -> None:
     model = model.to(device)
 
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE)
+    optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE)  # ustawic L2, momentum, nesterov
     # optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
     # optimizer = optim.NAdam(model.parameters(), lr=LEARNING_RATE)
 
