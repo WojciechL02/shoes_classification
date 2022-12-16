@@ -1,20 +1,19 @@
 import torch
-import torch.optim as optim
-import torch.nn as nn
+from torch import optim
+from torch import nn
 from torch.utils.data import DataLoader
 from torchvision.datasets import ImageFolder
-import torchvision.transforms as transforms
+from torchvision import transforms
 from torchvision.models import resnet50, ResNet50_Weights
-from torchmetrics import Recall, Precision, F1Score
-import copy
 from train import train
 from validate import validate
+from metricsLogger import MetricsLogger
 
 
-def main():
+def main() -> None:
     TRAIN_PATH = "data/train"
     TEST_PATH = "data/test"
-    BATCH_SIZE = 32
+    BATCH_SIZE = 64
     LEARNING_RATE = 0.001
     EPOCHS = 5
 
@@ -22,13 +21,12 @@ def main():
 
     t = transforms.Compose(
         [
-            transforms.ColorJitter(),
-            transforms.RandomAffine(degrees=10, shear=50),
-            transforms.RandomRotation(degrees=30),
-            transforms.RandomHorizontalFlip(p=0.4),
-            transforms.CenterCrop(size=200),
-            transforms.ToTensor()
-            # transforms.Normalize(mean, std)
+            transforms.ColorJitter(),  # ustawic argumenty
+            transforms.RandomAffine(degrees=10, shear=(-20, 20)),
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.CenterCrop(size=224),
+            # sprawdzic size obrazkow dla resneta = 224x224x3
+            transforms.ToTensor()  # sprawdzic czy totensor skaluje do (0, 1) - TAK
         ]
     )
     train_dataset = ImageFolder(root=TRAIN_PATH, transform=t)
@@ -48,34 +46,14 @@ def main():
 
 
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
+    # optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
+    optimizer = optim.NAdam(model.parameters(), lr=LEARNING_RATE)
 
-    metrics = {"recall": Recall(num_classes=3), "precision": Precision(num_classes=3), "f1score": F1Score(num_classes=3)}
+    metrics_logger = MetricsLogger(num_classes=3)
 
-    train_acc = []
-    val_acc = []
-    train_loss = []
-    val_loss = []
-    train_recall = []
-    train_precision = []
-    train_f1score = []
-
-    for epoch in range(1):
-        loss, acc, recall, prec, f1 = train(model, device, train_loader, criterion, optimizer, metrics, epoch)
-        train_acc.append(acc)
-        train_loss.append(loss)
-        train_recall.append(recall)
-        train_precision.append(prec)
-        train_f1score.append(f1)
-
-        # v_loss, v_acc = validate(model, device, test_loader, criterion)
-        # val_acc.append(v_acc)
-        # val_loss.append(v_loss)
-
-    print(train_acc)
-    print(train_recall)
-    print(train_precision)
-    print(train_f1score)
+    for epoch in range(1, EPOCHS + 1):
+        train(model, device, train_loader, criterion, optimizer, epoch, metrics_logger)
+        validate(model, device, test_loader, criterion, epoch, metrics_logger)
 
 
 if __name__ == "__main__":
