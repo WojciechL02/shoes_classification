@@ -11,15 +11,15 @@ from train import train
 from validate import validate
 from metricsLogger import MetricsLogger
 
-from matplotlib import pyplot as plt
-from matplotlib import figure
-
 
 class Net(nn.Module):
     def __init__(self) -> None:
         super().__init__()
         self.conv1 = nn.Conv2d(3, 16, 3, 1, padding='same')
         self.conv2 = nn.Conv2d(16, 32, 3, 1, padding='same')
+        self.conv3 = nn.Conv2d(32, 32, 3, 1, padding='same')
+        self.conv4 = nn.Conv2d(32, 64, 3, 1, padding='same')
+        self.conv5 = nn.Conv2d(64, 64, 3, 1, padding='same')
         # self.b_norm2d = nn.BatchNorm2d(16)
         # self.b_norm1d = nn.BatchNorm1d(num_features=1024)
         # self.dropout1 = nn.Dropout(0.3)
@@ -31,12 +31,22 @@ class Net(nn.Module):
 
         x = self.conv1(x)
         x = F.relu(x)
-
         x = F.max_pool2d(x, 2)
 
         x = self.conv2(x)
         x = F.relu(x)
+        x = F.max_pool2d(x, 2)
 
+        x = self.conv3(x)
+        x = F.relu(x)
+        x = F.max_pool2d(x, 2)
+
+        x = self.conv4(x)
+        x = F.relu(x)
+        x = F.max_pool2d(x, 2)
+
+        x = self.conv5(x)
+        x = F.relu(x)
         x = F.max_pool2d(x, 2)
 
         x = torch.flatten(x, 1)
@@ -52,11 +62,6 @@ def main():
     train_path = "data/train"
     test_path = "data/test"
     save_path = "cnn/cnn_model.pth"
-
-    BATCH_SIZE = 32
-    LEARNING_RATE = 0.01
-    GAMMA = 1e-5
-    EPOCHS = 10
 
     t = transforms.Compose(
         [
@@ -74,6 +79,11 @@ def main():
             transforms.ToTensor()
         ]
     )
+
+    BATCH_SIZE = 32
+    LEARNING_RATE = 0.01
+    GAMMA = 1e-5
+    EPOCHS = 10
 
     train_dataset = ImageFolder(root=train_path, transform=t)
     test_dataset = ImageFolder(root=test_path, transform=test_t)
