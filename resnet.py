@@ -13,22 +13,23 @@ from metricsLogger import MetricsLogger
 def main() -> None:
     TRAIN_PATH = "data/train"
     TEST_PATH = "data/test"
-    BATCH_SIZE = 64
-    LEARNING_RATE = 0.001
-    EPOCHS = 5
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
     t = transforms.Compose(
         [
-            transforms.ColorJitter(),  # ustawic argumenty
+            transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.4, hue=0.2),
             transforms.RandomAffine(degrees=10, shear=(-20, 20)),
             transforms.RandomHorizontalFlip(p=0.5),
             transforms.CenterCrop(size=224),
-            # sprawdzic size obrazkow dla resneta = 224x224x3
-            transforms.ToTensor()  # sprawdzic czy totensor skaluje do (0, 1) - TAK
+            transforms.ToTensor()
         ]
     )
+
+    BATCH_SIZE = 64
+    LEARNING_RATE = 0.001
+    EPOCHS = 5
+
     train_dataset = ImageFolder(root=TRAIN_PATH, transform=t)
     test_dataset = ImageFolder(root=TEST_PATH, transform=transforms.ToTensor())
     train_loader = DataLoader(train_dataset, shuffle=True, batch_size=BATCH_SIZE)
@@ -44,10 +45,10 @@ def main() -> None:
     model.fc = nn.Linear(in_features=num_ftrs, out_features=3)
     model = model.to(device)
 
-
     criterion = nn.CrossEntropyLoss()
+    optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE)
     # optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
-    optimizer = optim.NAdam(model.parameters(), lr=LEARNING_RATE)
+    # optimizer = optim.NAdam(model.parameters(), lr=LEARNING_RATE)
 
     metrics_logger = MetricsLogger(num_classes=3)
 
