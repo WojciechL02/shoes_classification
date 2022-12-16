@@ -1,21 +1,23 @@
 import torch
 
 
-def validate(model, device, test_loader, criterion):
+def validate(model, device, test_loader, criterion, epoch, logger):
     model.eval()
-    test_loss = 0
+    running_loss = 0
     correct = 0
     with torch.no_grad():
-        for data, label in test_loader:
-            data, label = data.to(device), label.to(device)
+        for batch_id, (data, labels) in enumerate(test_loader):
+            data, labels = data.to(device), labels.to(device)
             output = model(data)
-            test_loss += criterion(output, label).item()
+            running_loss += criterion(output, labels).item()
             pred = output.argmax(dim=1, keepdim=True)
-            correct += pred.eq(label.view_as(pred)).sum().item()
 
-    test_loss /= len(test_loader.dataset)
-    accuracy = 100 * correct / len(test_loader.dataset)
+            correct += pred.eq(labels.view_as(pred)).sum().item()
 
-    print(f"\tVAL: Loss={test_loss:.3f}, Acc={accuracy:.1f}")
-    return test_loss, accuracy
+            if batch_id == len(test_loader) - 1:
+                logger.log_epoch(output, labels, running_loss, epoch, training=False)
 
+    test_loss = running_loss / len(test_loader)
+    accuracy = correct / len(test_loader.dataset)
+
+    print(f"\tVAL: Loss={test_loss:.3f}, Acc={accuracy:.4f}")
