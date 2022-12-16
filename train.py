@@ -1,19 +1,11 @@
 
 
-def train(model, device, train_loader, criterion, optimizer, metrics, epoch):
+def train(model, device, train_loader, criterion, optimizer, epoch, metrics_logger) -> None:
     model.train()
-    sum_loss = 0
-    n_samples = 0
-    n_batches = 0
+    running_loss = 0
     correct = 0
 
-    recall_sum = 0
-    precision_sum = 0
-    f1_sum = 0
     for batch_id, (data, labels) in enumerate(train_loader):
-        n_batches += 1
-        n_samples += len(data)
-
         data, labels = data.to(device), labels.to(device)
         optimizer.zero_grad()
         output = model(data)
@@ -25,18 +17,11 @@ def train(model, device, train_loader, criterion, optimizer, metrics, epoch):
         loss.backward()
         optimizer.step()
 
+        running_loss += loss.item()
+        if batch_id == len(train_loader) - 1:
+            metrics_logger.log_epoch(output, labels, running_loss, epoch)
 
-        sum_loss += loss.item()
-        recall_sum += metrics["recall"](output, labels).item()
-        precision_sum += metrics["precision"](output, labels).item()
-        f1_sum += metrics["f1score"](output, labels).item()
+    avg_loss = running_loss / len(train_loader)
+    accuracy = correct / len(train_loader.dataset)
 
-    avg_loss = sum_loss / n_samples
-    accuracy = 100 * correct / n_samples
-    avg_recall = recall_sum / n_batches
-    avg_precision = precision_sum / n_batches
-    avg_f1 = f1_sum / n_batches
-
-    print(f"Epoch={epoch}, avg_loss={avg_loss:.3f}, acc={accuracy:.2f}, recall={avg_recall:.2f}, precision={avg_precision:.2f}, f1={avg_f1:.2f}")
-    return avg_loss, accuracy, avg_recall, avg_precision, avg_f1
-
+    print(f"Epoch={epoch}, avg_loss={avg_loss:.3f}, acc={accuracy:.4f}")
